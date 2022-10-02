@@ -1,34 +1,17 @@
-import React from 'react'
-import logo from './logo.svg'
-import './App.css'
-import phaserGame from './PhaserGame'
-import HelloWorldScene from './scenes/HelloWorldScene'
-
-const handleClick = () => {
-  const scene = phaserGame.scene.keys.helloworld as HelloWorldScene
-  scene.createEmitter()
-}
+import { useEffect } from 'react';
+import './App.css';
+import Phaser from 'phaser';
+import config from './PhaserGame';
+import Welcome from './scenes/Welcome';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Just a vanilla create-react-app overlaying a Phaser canvas :)</p>
-        <a
-          className="App-link"
-          href="https://github.com/kevinshen56714/create-react-phaser3-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Source
-        </a>
-        <button className="App-button" onClick={handleClick}>
-          Or click me
-        </button>
-      </header>
-    </div>
-  )
+  useEffect(() => {
+    new Phaser.Game(config);
+    // const scene = phaserGame.scene.keys.welcome as Welcome;
+    // phaserGame.scene.start(Welcome);
+  }, []);
+
+  return <div className="App"></div>;
 }
 
-export default App
+export default App;

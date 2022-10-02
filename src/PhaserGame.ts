@@ -1,23 +1,23 @@
-import Phaser from 'phaser'
+import Phaser from 'phaser';
 
-import HelloWorldScene from './scenes/HelloWorldScene'
+import HelloWorldScene from './scenes/HelloWorldScene';
+import Welcome from './scenes/Welcome';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'phaser-container',
-  backgroundColor: '#282c34',
   scale: {
-    mode: Phaser.Scale.ScaleModes.RESIZE,
-    width: window.innerWidth,
-    height: window.innerHeight,
-  },
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 200 },
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 3024,
+    height: 1964,
+    max: {
+      width: 1600,
+      height: 900,
     },
   },
-  scene: [HelloWorldScene],
-}
+  scene: [Welcome],
+};
 
-export default new Phaser.Game(config)
+// export default new Phaser.Game(config);
+export default config;
