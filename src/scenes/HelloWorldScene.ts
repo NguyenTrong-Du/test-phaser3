@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { metamaskChecking } from '../service';
 export default class HelloWorldScene extends Phaser.Scene {
   talkText!: Phaser.GameObjects.Text;
   container!: Phaser.GameObjects.Container;

@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
+import { metamaskChecking } from '../service';
+import { metamaskState } from '../store/metamask';
+import { setRecoil, getRecoil } from 'recoil-nexus';
 export default class Welcome extends Phaser.Scene {
   container!: Phaser.GameObjects.Container;
+  loadingText2!: Phaser.GameObjects.Text;
+  start!: Phaser.GameObjects.Text;
   constructor() {
     super('welcome');
   }
@@ -15,40 +20,98 @@ export default class Welcome extends Phaser.Scene {
     this.load.image('crank', 'assets/crank.svg');
 
     this.load.audio('test', '/assets/test.mp3');
+
+    var width = this.cameras.main.width;
+    var height = this.cameras.main.height;
+    var progressBox = this.add.graphics();
+    var progressBar = this.add.graphics();
+
+    progressBox.fillStyle(0x77889e);
+    progressBox.fillRoundedRect(width / 2 - 500, height / 2 - 50, 1000, 100, 0);
+    var loadingText = this.make.text({
+      x: width / 2,
+      y: height / 2 + 100,
+      text: 'Loading...',
+      style: {
+        fontSize: '40px',
+        color: '#ffffff',
+      },
+    });
+    loadingText.setOrigin(0.5, 0.5);
+
+    var percentText = this.make.text({
+      x: width / 2,
+      y: height / 2,
+      text: '0%',
+      style: {
+        fontSize: '30px',
+        color: '#000',
+      },
+    });
+    percentText.setOrigin(0.5, 0.5);
+
+    this.load.on('progress', function (value: number) {
+      const percent = (value * 100).toFixed();
+      percentText.setText(`${percent}%`);
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRoundedRect(
+        width / 2 - 500,
+        height / 2 - 50,
+        1000 * value,
+        100,
+        0
+      );
+    });
+
+    this.load.on('complete', function () {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      percentText.destroy();
+      metamaskChecking().then((data) => {
+        const state = data.length > 4;
+        setRecoil(metamaskState, state);
+      });
+    });
   }
 
   create() {
-    this.createEmitter();
-  }
-
-  update() {}
-
-  createEmitter() {
     const { width, height } = this.sys.game.canvas;
 
     const bg = this.add.image(0, 0, 'bg').setOrigin(0);
-    const eclipse2 = this.add.image(0, 0, 'eclipse2');
-    const light = this.add.image(0, 0, 'light');
-    const eclipse = this.add.image(0, 200, 'eclipse');
-    const crank = this.add.image(0, 0, 'crank');
-    const room = this.add.image(0, 0, 'room');
-    light.setScale(2);
-    crank.setScale(1.8);
-    room.setDisplaySize(348, 600);
-    eclipse2.setDisplaySize(348, 90);
-    eclipse.setDisplaySize(348, 90);
-    Phaser.Display.Align.In.Center(light, bg, 0, -light.height / 2);
-    // Phaser.Display.Align.In.Center(room, bg, 0, 100);
-    // Phaser.Display.Align.In.Center(eclipse2, room, 0, -300);
-    // Phaser.Display.Align.In.Center(eclipse, room, 0, 253);
-    // Phaser.Display.Align.In.Center(crank, room, 0, 200);
+    this.loadingText2 = this.make.text({
+      x: width / 2,
+      y: height / 2 + 100,
+      text: 'Metamask checking...',
+      style: {
+        fontSize: '40px',
+        color: '#ffffff',
+      },
+    });
+    this.loadingText2.setOrigin(0.5, 0.5);
 
-    this.container = this.add
-      .container(width / 2, height / 2, [crank, room, eclipse2, eclipse])
-      .setSize(50, 50);
+    this.start = this.add
+      .text(width / 2, height / 2, 'Start', {
+        fontSize: '50px',
+        color: '#0ff',
+        backgroundColor: '#ddd',
+      })
+      .setPadding(10)
+      .setInteractive({ cursor: 'pointer' });
+    this.start.visible = false;
 
-    const container = this.add
-      .container(width / 4, height / 4, [crank, room, eclipse2, eclipse])
-      .setSize(50, 50);
+    this.start.on('pointerdown', function () {
+      // this.scene.launch('hello');
+      console.log('first');
+    });
+  }
+
+  update() {
+    const isInstall = getRecoil(metamaskState);
+    if (isInstall) {
+      this.loadingText2.destroy();
+      this.start.visible = true;
+    }
   }
 }

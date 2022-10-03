@@ -16,7 +16,7 @@ const config: Phaser.Types.Core.GameConfig = {
       height: 900,
     },
   },
-  scene: [Welcome],
+  scene: [Welcome, HelloWorldScene],
 };
 
 // export default new Phaser.Game(config);
